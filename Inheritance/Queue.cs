@@ -1,25 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Inheritance
 {
-    class LinkedList<T> : IDataStructures<T>
+    class Queue<T> : IDataStructures<T>
     {
         private CustomNode<T> _head;
         private int _count = 0;
+        private int _max = -1;
 
         public int Count { get => Count1; set => Count1 = value; }
+        public int Max { get => _max; set => _max = value; }
         public int Count1 { get => _count; set => _count = value; }
 
-        public LinkedList()
+        public Queue()
         {
             _head = null;
+            Max = -1;
+        }
+
+        public Queue(int maxValue)
+        {
+            Max = maxValue;
         }
 
         public void Add(ref T value)
         {
+            if (Count == Max)
+                return;
             CustomNode<T> newNode = new CustomNode<T>(ref value);
             if (_head == null)
             {
@@ -67,6 +78,7 @@ namespace Inheritance
             {
                 if (_head.Next == _head)
                 {
+                    Count--;
                     _head = null;
                     return;
                 }
@@ -97,95 +109,6 @@ namespace Inheritance
             }
         }
 
-        public void AddAt(ref T value, int index)
-        {
-            if (index > Count1)
-                return;
-            CustomNode<T> newNode = new CustomNode<T>(ref value);
-            newNode.Index = index;
-            newNode.Index = index;
-            if (index == 0)
-            {
-                if (Count == 0)
-                {
-                    _head = newNode;
-                    newNode.Next = _head;
-                    newNode.Prev = _head;
-                    Count++;
-                    return;
-                }
-                newNode.Next = _head;
-                newNode.Prev = _head.Prev;
-                _head.Prev.Next = newNode;
-                _head.Prev = newNode;
-                _head = newNode;
-                Count++;
-                for (CustomNode<T> iterator = _head.Next; iterator != _head; iterator = iterator.Next)
-                {
-                    iterator.Index++;
-                }
-                return;
-            }
-            if (index == Count)
-            {
-                newNode.Prev = _head.Prev;
-                newNode.Next = _head;
-                _head.Prev.Next = newNode;
-                _head.Prev = newNode;
-                return;
-            }
-            CustomNode<T> iterator1 = _head.Next;
-            for (; iterator1 != _head; iterator1 = iterator1.Next)
-            {
-                if (iterator1.Index == index)
-                {
-                    newNode.Prev = iterator1.Prev;
-                    newNode.Next = iterator1;
-                    iterator1.Prev.Next = newNode;
-                    iterator1.Prev = newNode;
-                    for (CustomNode<T> iterator2 = newNode.Next; iterator2 != _head; iterator2 = iterator2.Next)
-                        iterator2.Index++;
-                }
-            }
-        }
-
-        public void RemoveAt(int index)
-        {
-            if (index >= Count1)
-                return;
-            Count--;
-            if (index == 0)
-            {
-                if (_head.Next == _head)
-                {
-                    _head = null;
-                    return;
-                }
-                _head.Next.Prev = _head.Prev;
-                _head.Prev.Next = _head.Next;
-                _head = _head.Next;
-                _head.Index = 0;
-                for (CustomNode<T> iterator = _head.Next; iterator != _head; iterator = iterator.Next)
-                {
-                    iterator.Index--;
-                }
-                return;
-            }
-            for (CustomNode<T> iterator = _head.Next; iterator != _head; iterator = iterator.Next)
-            {
-                if (iterator.Index == index)
-                {
-                    iterator.Prev.Next = iterator.Next;
-                    iterator.Next.Prev = iterator.Prev;
-                    if (iterator.Next == _head)
-                        return;
-                    for (CustomNode<T> iterator2 = iterator.Next; iterator2 != _head; iterator2 = iterator2.Next)
-                        iterator2.Index--;
-                    return;
-                }
-            }
-        }
-
         public void Sort()
         {
             if (_head == null || _head.Next == _head)
@@ -200,7 +123,7 @@ namespace Inheritance
                 {
                     if (Convert.ToInt32(iterator2.Data) > Convert.ToInt32(iterator2.Next.Data))
                     {
-                        tempData =iterator2.Data;
+                        tempData = iterator2.Data;
                         tempIndex = iterator2.Index;
                         iterator2.Data = iterator2.Next.Data;
                         iterator2.Index = iterator2.Next.Index;
@@ -213,9 +136,43 @@ namespace Inheritance
 
         }
 
-        public void Clear()
+        public void Enqueue(ref T value)
         {
-            _head = null;
+            Add(ref value);
+        }
+
+        public void Dequeue()
+        {
+            if (_head == null)
+                return;
+            if (_head.Next == _head)
+            {
+                _head = null;
+                return;
+            }
+            _head.Next.Prev = _head.Prev;
+            _head.Prev.Next = _head.Next;
+            _head = _head.Next;
+            Count--;
+        }
+
+        public T Peek()
+        {
+            if (_head == null)
+                return default(T);
+            return _head.Data;
+        }
+        public bool IsEmpty()
+        {
+            if (_head == null)
+                return true;
+            return false;
+        }
+        public bool IsFull()
+        {
+            if (Count == Max)
+                return true;
+            return false;
         }
     }
 }
